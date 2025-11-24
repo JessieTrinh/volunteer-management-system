@@ -1,0 +1,276 @@
+<!-- File: signups/templates/signups/coordinatorSignup.html
+     Purpose:
+       Separate signup form for community coordinators who will create volunteer opportunities.
+       This keeps coordinators and student volunteers separate.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Coordinator Signup - Volunteer Hub</title>
+    <style>
+        :root {
+            --bg: #F0F8FF;
+            --primary: #4A90E2;
+            --primary-dark: #357ABD;
+            --card: #ffffff;
+            --text: #2E2A2B;
+            --muted: #666666;
+            --success: #4CAF50;
+            --error: #f44336;
+            --shadow: rgba(74, 144, 226, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Inter, system-ui, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--card);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .toggle-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toggle-link a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .back-link a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link a:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back-link">
+            <a href="/">&larr; Back to main page</a>
+        </div>
+        
+        <h1>🤝 Coordinator Signup</h1>
+        <p class="subtitle">Join as a community coordinator to create volunteer opportunities</p>
+
+        <form id="coordinatorForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+
+            <div class="form-group">
+                <label for="organization">Organization/Community Group *</label>
+                <input type="text" id="organization" name="organization" required placeholder="e.g., Community Center, Non-profit Organization">
+            </div>
+
+            <button type="submit" class="btn">Sign Up as Coordinator</button>
+        </form>
+
+        <div id="message" class="message"></div>
+
+        <div class="toggle-link">
+            <p>Looking for volunteer opportunities? <a href="/volunteer-signup/">Sign up as a Student Volunteer</a></p>
+        </div>
+    </div>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            
+            const messageEl = document.getElementById('message');
+            messageEl.style.display = 'none';
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                organization: document.getElementById('organization').value,
+                active: true
+            };
+
+            try {
+                const response = await fetch('/api/coordinators/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    messageEl.className = 'message success';
+                    messageEl.textContent = 'Signup successful! Welcome to Volunteer Hub as a coordinator.';
+                    messageEl.style.display = 'block';
+                    
+                    // Reset form
+                    document.getElementById('coordinatorForm').reset();
+                    
+                    // Redirect to coordinator dashboard after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/coordinator-dashboard/';
+                    }, 2000);
+                } else {
+                    const errorData = await response.json();
+                    messageEl.className = 'message error';
+                    messageEl.textContent = errorData.detail || 'Signup failed. Please try again.';
+                    messageEl.style.display = 'block';
+                }
+            } catch (error) {
+                messageEl.className = 'message error';
+                messageEl.textContent = 'Network error. Please check your connection and try again.';
+                messageEl.style.display = 'block';
+            }
+        }
+
+        document.getElementById('coordinatorForm').addEventListener('submit', handleSignup);
+    </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Cmpt 370 project</title>
+    <style>
+        :root {
+            --bg: #FFF3F7;
+            --primary: #E46B8C;
+            --primary-dark: #C15575;
+            --card-bg: white;
+            --card-shadow: rgba(228,107,140,0.2);
+        }
+
+        * { font-family: Inter, sans-serif; box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 5px 12px var(--card-shadow);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-dark);
+            margin-bottom: 30px;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff8f9;
+            padding: 20px;
+            border-left: 6px solid var(--primary);
+            border-radius: 15px;
+            box-shadow: 0 3px 6px var(--card-shadow);
+        }
+
+        .card h2 {
+            margin: 0 0 10px;
+            color: var(--primary-dark);
+        }
+
+        .card a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+        }
+
+        .card a:hover {
+            background: var(--primary-dark);
+        }
+
+        form {
+            margin-bottom: 40px;
+        }
+
+        .post {
+            background: #fff8f9;
+            padding: 20px;
+            border-left: 6px solid var(--primary);
+            border-radius: 15px;
+            box-shadow: 0 3px 6px var(--card-shadow);
+            margin-bottom: 20px;
+        }
+
+        .post h2 {
+            margin: 0 0 10px;
+            color: var(--primary-dark);
+        }
+
+        .post button {
+            margin-right: 10px;
+            padding: 10px 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .post button:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cmpt 370 Project</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit</button>
+        </form>
+        <div id="postsContainer">
+            {% for post in posts %}
+            <div class="post">
+                <h2>{{ post.title }}</h2>
+                <p>{{ post.content }}</p>
+                <a href="{% url 'post_edit' post.pk %}">Edit</a>
+                <form method="post" action="{% url 'post_delete' post.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

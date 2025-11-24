@@ -1,0 +1,718 @@
+<!-- File: signups/templates/signups/unified_auth.html
+     Purpose:
+       Unified authentication page that automatically determines if user should sign up or sign in
+       based on whether their email is already registered.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Volunteer Hub</title>
+    <style>
+        :root {
+            --bg: #F8FAFC;
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --volunteer-color: #E46B8C;
+            --coordinator-color: #4A90E2;
+            --card: #ffffff;
+            --text: #1E293B;
+            --muted: #64748B;
+            --success: #4CAF50;
+            --error: #f44336;
+            --shadow: rgba(99, 102, 241, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Inter, system-ui, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero {
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .auth-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 25px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        input[type="email"],
+        input[type="text"],
+        input[type="tel"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="email"]:focus,
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn.volunteer {
+            background: var(--volunteer-color);
+        }
+
+        .btn.volunteer:hover {
+            background: #C15575;
+        }
+
+        .btn.coordinator {
+            background: var(--coordinator-color);
+        }
+
+        .btn.coordinator:hover {
+            background: #357ABD;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #e8f5e8;
+            color: var(--success);
+        }
+
+        .message.error {
+            background: #fdeaea;
+            color: var(--error);
+        }
+
+        .user-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .user-type-btn {
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            background: var(--card);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-type-btn.selected {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+
+        .user-type-btn h3 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+        }
+
+        .user-type-btn p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .back-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>🌟 Welcome to Volunteer Hub</h1>
+            <p>Connect with your community through meaningful volunteer opportunities</p>
+        </div>
+
+        <!-- Back to Landing Link -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="/" style="color: var(--muted); text-decoration: none; font-size: 0.9rem;">
+                ← Back to Main Page
+            </a>
+        </div>
+
+        <div class="auth-card">
+            <!-- Step 1: Email Entry -->
+            <div id="email-step" class="form-step active">
+                <h2>Get Started</h2>
+                <p style="color: var(--muted); margin-bottom: 25px;">Enter your email to continue</p>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="your@email.com" required>
+                </div>
+                
+                <button type="button" class="btn" onclick="checkEmail()">Continue</button>
+                
+                <div id="email-message" class="message" style="display: none;"></div>
+            </div>
+
+            <!-- Step 2: Sign In (if account exists) -->
+            <div id="signin-step" class="form-step">
+                <h2>Welcome Back!</h2>
+                <p id="welcome-text" style="color: var(--muted); margin-bottom: 25px;"></p>
+                
+                <div class="form-group">
+                    <label for="signin-password">Password</label>
+                    <input type="password" id="signin-password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="button" id="signin-btn" class="btn" onclick="signIn()">Sign In</button>
+                
+                <div id="signin-message" class="message" style="display: none;"></div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="#" class="back-link" onclick="goBack()">← Use a different email</a>
+                </div>
+            </div>
+
+            <!-- Step 2B: Password Reset (for existing users without proper passwords) -->
+            <div id="password-reset-step" class="form-step">
+                <h2>Set Up Your Password</h2>
+                <p style="color: var(--muted); margin-bottom: 25px;">
+                    To secure your account, please create a password for future logins.
+                </p>
+                
+                <div class="form-group">
+                    <label for="new-password">Create Password</label>
+                    <input type="password" id="new-password" placeholder="Create a secure password" required minlength="6">
+                    <small style="color: var(--muted); display: block; margin-top: 5px;">
+                        Password must be at least 6 characters long
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-new-password">Confirm Password</label>
+                    <input type="password" id="confirm-new-password" placeholder="Re-enter your password" required>
+                </div>
+                
+                <button type="button" class="btn" onclick="setNewPassword()">Set Password & Sign In</button>
+                
+                <div id="password-reset-message" class="message" style="display: none;"></div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="#" class="back-link" onclick="goBack()">← Use a different email</a>
+                </div>
+            </div>
+
+            <!-- Step 3: Choose User Type (if new account) -->
+            <div id="usertype-step" class="form-step">
+                <h2>Join as...</h2>
+                <p style="color: var(--muted); margin-bottom: 25px;">Choose how you'd like to participate</p>
+                
+                <div class="user-type-selector">
+                    <div class="user-type-btn" onclick="selectUserType('volunteer')" id="volunteer-type">
+                        <h3>🎓 Student Volunteer</h3>
+                        <p>Find volunteer opportunities</p>
+                    </div>
+                    <div class="user-type-btn" onclick="selectUserType('coordinator')" id="coordinator-type">
+                        <h3>🏢 Coordinator</h3>
+                        <p>Create opportunities</p>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn" onclick="proceedToSignup()" id="continue-signup-btn" disabled>Continue</button>
+                
+                <a href="#" class="back-link" onclick="goBack()">← Use a different email</a>
+            </div>
+
+            <!-- Step 4: Signup Form -->
+            <div id="signup-step" class="form-step">
+                <h2 id="signup-title">Complete Registration</h2>
+                <p style="color: var(--muted); margin-bottom: 25px;">Just a few more details to get started</p>
+                
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Create a secure password" required minlength="6">
+                        <small style="color: var(--muted); display: block; margin-top: 5px;">
+                            Password must be at least 6 characters long
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password</label>
+                        <input type="password" id="confirm-password" placeholder="Re-enter your password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number (optional)</label>
+                        <input type="tel" id="phone">
+                    </div>
+                    
+                    <div class="form-group" id="organization-group" style="display: none;">
+                        <label for="organization">Organization</label>
+                        <input type="text" id="organization">
+                    </div>
+                    
+                    <button type="submit" class="btn" id="signup-submit-btn">Create Account</button>
+                </form>
+                
+                <div id="signup-message" class="message" style="display: none;"></div>
+                
+                <a href="#" class="back-link" onclick="goBackToUserType()">← Change account type</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEmail = '';
+        let selectedUserType = '';
+        let userData = {};
+
+        // Check URL parameters for user type preference
+        function initializeFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userType = urlParams.get('type');
+            
+            if (userType === 'volunteer' || userType === 'coordinator') {
+                selectedUserType = userType;
+                const radioButton = document.querySelector(`input[value="${userType}"]`);
+                if (radioButton) {
+                    radioButton.checked = true;
+                    updateUserTypeDisplay();
+                }
+            }
+        }
+
+        function updateUserTypeDisplay() {
+            const volunteerOption = document.querySelector('.user-type-option[data-type="volunteer"]');
+            const coordinatorOption = document.querySelector('.user-type-option[data-type="coordinator"]');
+            
+            // Reset styles
+            volunteerOption.classList.remove('selected');
+            coordinatorOption.classList.remove('selected');
+            
+            // Apply selected style
+            if (selectedUserType === 'volunteer') {
+                volunteerOption.classList.add('selected');
+            } else if (selectedUserType === 'coordinator') {
+                coordinatorOption.classList.add('selected');
+            }
+        }
+
+        async function checkEmail() {
+            const emailInput = document.getElementById('email');
+            const email = emailInput.value.trim();
+            
+            if (!email) {
+                showMessage('email-message', 'Please enter your email address', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showMessage('email-message', 'Please enter a valid email address', 'error');
+                return;
+            }
+            
+            currentEmail = email;
+            
+            try {
+                const response = await fetch('/check-email/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await response.json();
+                
+                if (data.exists) {
+                    // User exists, show sign in
+                    userData = data;
+                    showSignInStep();
+                } else {
+                    // New user, show user type selection
+                    showUserTypeStep();
+                }
+                
+            } catch (error) {
+                console.error('Error checking email:', error);
+                showMessage('email-message', 'Error connecting to server. Please try again.', 'error');
+            }
+        }
+
+        function showSignInStep() {
+            document.getElementById('welcome-text').textContent = `Welcome back, ${userData.name}!`;
+            
+            const signinBtn = document.getElementById('signin-btn');
+            signinBtn.className = `btn ${userData.user_type}`;
+            signinBtn.textContent = `Sign In as ${userData.user_type === 'volunteer' ? 'Student Volunteer' : 'Coordinator'}`;
+            
+            // Check if user has temporary password and needs to set a new one
+            if (userData.needs_password_reset) {
+                showPasswordResetStep();
+            } else {
+                showStep('signin-step');
+            }
+        }
+
+        function showUserTypeStep() {
+            showStep('usertype-step');
+        }
+
+        function selectUserType(type) {
+            selectedUserType = type;
+            
+            // Update visual selection
+            document.getElementById('volunteer-type').classList.toggle('selected', type === 'volunteer');
+            document.getElementById('coordinator-type').classList.toggle('selected', type === 'coordinator');
+            
+            // Enable continue button
+            document.getElementById('continue-signup-btn').disabled = false;
+        }
+
+        function proceedToSignup() {
+            if (!selectedUserType) return;
+            
+            // Update signup form based on user type
+            const title = selectedUserType === 'volunteer' ? 'Student Volunteer Registration' : 'Coordinator Registration';
+            document.getElementById('signup-title').textContent = title;
+            
+            const submitBtn = document.getElementById('signup-submit-btn');
+            submitBtn.className = `btn ${selectedUserType}`;
+            submitBtn.textContent = `Create ${selectedUserType === 'volunteer' ? 'Student' : 'Coordinator'} Account`;
+            
+            // Show/hide organization field for coordinators
+            const orgGroup = document.getElementById('organization-group');
+            orgGroup.style.display = selectedUserType === 'coordinator' ? 'block' : 'none';
+            
+            showStep('signup-step');
+        }
+
+        async function signIn() {
+            const password = document.getElementById('signin-password').value;
+            
+            if (!password) {
+                showMessage('signin-message', 'Please enter your password', 'error');
+                return;
+            }
+            
+            try {
+                showMessage('signin-message', 'Signing you in...', 'success');
+                
+                // Call the appropriate signin API endpoint
+                const apiUrl = userData.user_type === 'volunteer' ? '/api/volunteers/signin/' : '/api/coordinators/signin/';
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        email: currentEmail,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showMessage('signin-message', 'Sign in successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 1000);
+                } else if (data.error && data.error.includes('temporary_password')) {
+                    // User has temporary password, need to reset
+                    showPasswordResetStep();
+                } else {
+                    showMessage('signin-message', data.error || 'Invalid credentials', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error signing in:', error);
+                showMessage('signin-message', 'Error signing in. Please try again.', 'error');
+            }
+        }
+
+        function showPasswordResetStep() {
+            const resetBtn = document.querySelector('#password-reset-step .btn');
+            resetBtn.className = `btn ${userData.user_type}`;
+            showStep('password-reset-step');
+        }
+
+        async function setNewPassword() {
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-new-password').value;
+            
+            // Validation
+            if (!newPassword) {
+                showMessage('password-reset-message', 'Please enter a password', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showMessage('password-reset-message', 'Password must be at least 6 characters long', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showMessage('password-reset-message', 'Passwords do not match', 'error');
+                return;
+            }
+            
+            try {
+                showMessage('password-reset-message', 'Setting up your password...', 'success');
+                
+                // Update password via API
+                const apiUrl = userData.user_type === 'volunteer' ? `/api/volunteers/${userData.user_id}/` : `/api/coordinators/${userData.coordinator_id || userData.user_id}/`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        password: newPassword
+                    })
+                });
+                
+                if (response.ok) {
+                    showMessage('password-reset-message', 'Password set successfully! Signing you in...', 'success');
+                    setTimeout(() => {
+                        window.location.href = userData.dashboard_url;
+                    }, 1500);
+                } else {
+                    const errorData = await response.json();
+                    showMessage('password-reset-message', errorData.error || 'Error setting password', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error setting password:', error);
+                showMessage('password-reset-message', 'Error setting password. Please try again.', 'error');
+            }
+        }
+
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const phone = document.getElementById('phone').value.trim();
+            const organization = document.getElementById('organization').value.trim();
+            
+            // Validation
+            if (!name) {
+                showMessage('signup-message', 'Please enter your name', 'error');
+                return;
+            }
+            
+            if (!password) {
+                showMessage('signup-message', 'Please enter a password', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('signup-message', 'Password must be at least 6 characters long', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('signup-message', 'Passwords do not match', 'error');
+                return;
+            }
+            
+            const payload = {
+                name: name,
+                email: currentEmail,
+                password: password,
+                phone: phone
+            };
+            
+            if (selectedUserType === 'coordinator') {
+                payload.organization = organization;
+            }
+            
+            try {
+                const apiUrl = selectedUserType === 'volunteer' ? '/api/volunteers/' : '/api/coordinators/';
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    showMessage('signup-message', 'Account created successfully! Redirecting...', 'success');
+                    
+                    setTimeout(() => {
+                        const dashboardUrl = selectedUserType === 'volunteer' ? '/home/' : '/coordinator-dashboard/';
+                        window.location.href = dashboardUrl;
+                    }, 1200);
+                } else {
+                    const errorData = await response.json();
+                    showMessage('signup-message', errorData.error || 'Error creating account. Please try again.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error creating account:', error);
+                showMessage('signup-message', 'Error connecting to server. Please try again.', 'error');
+            }
+        });
+
+        function showStep(stepId) {
+            // Hide all steps
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Show selected step
+            document.getElementById(stepId).classList.add('active');
+        }
+
+        function goBack() {
+            currentEmail = '';
+            userData = {};
+            document.getElementById('email').value = '';
+            showStep('email-step');
+        }
+
+        function goBackToUserType() {
+            selectedUserType = '';
+            document.getElementById('continue-signup-btn').disabled = true;
+            document.querySelectorAll('.user-type-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            showStep('usertype-step');
+        }
+
+        function showMessage(elementId, message, type) {
+            const messageEl = document.getElementById(elementId);
+            messageEl.textContent = message;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            
+            // Hide message after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Initialize page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeFromUrl);
+    </script>
+</body>
+</html>

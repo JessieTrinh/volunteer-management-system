@@ -1,0 +1,327 @@
+<!-- File: signups/templates/signups/landingPage.html
+     Purpose:
+       Main         .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }llows users to choose between signing up as:
+       1. Student Volunteer (looking for opportunities)
+       2. Community Coordinator (creating opportunities)
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Volunteer Hub</title>
+    <style>
+        :root {
+            --bg: #F8FAFC;
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --volunteer-color: #E46B8C;
+            --coordinator-color: #4A90E2;
+            --card: #ffffff;
+            --text: #1E293B;
+            --muted: #64748B;
+            --shadow: rgba(99, 102, 241, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Inter, system-ui, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+            color: var(--text);
+            min-height: 100vh;
+            position: relative;
+            background-image: 
+                url('/media/images/volunteer_1.jpg'),
+                linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(228, 107, 140, 0.1) 100%);
+            background-size: cover, cover;
+            background-position: center, center;
+            background-repeat: no-repeat, no-repeat;
+            background-attachment: fixed, fixed;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(248, 250, 252, 0.4);
+            backdrop-filter: blur(1px);
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero {
+            margin-bottom: 50px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Arial Black', Arial, sans-serif;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .signup-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .signup-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 25px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .signup-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px var(--shadow);
+        }
+
+        .volunteer-card {
+            border-color: var(--volunteer-color);
+        }
+
+        .volunteer-card:hover {
+            border-color: var(--volunteer-color);
+        }
+
+        .coordinator-card {
+            border-color: var(--coordinator-color);
+        }
+
+        .coordinator-card:hover {
+            border-color: var(--coordinator-color);
+        }
+
+        .card-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .volunteer-card .card-title {
+            color: var(--volunteer-color);
+        }
+
+        .coordinator-card .card-title {
+            color: var(--coordinator-color);
+        }
+
+        .card-description {
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .card-button {
+            background: linear-gradient(135deg, var(--volunteer-color), #C15575);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .coordinator-card .card-button {
+            background: linear-gradient(135deg, var(--coordinator-color), #357ABD);
+        }
+
+        .card-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .features {
+            margin-top: 60px;
+            text-align: left;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--text);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .feature-text {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .signup-options {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .signup-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>🤝 Volunteer Hub</h1>
+            <p>Connect students with meaningful volunteer opportunities in their community. Whether you're looking to volunteer or create opportunities, we've got you covered.</p>
+        </div>
+
+        <div class="signup-options">
+            <div class="signup-card volunteer-card" onclick="goToAuth('volunteer')">
+                <div class="card-icon">🎓</div>
+                <h2 class="card-title">I'm a Student</h2>
+                <p class="card-description">
+                    Looking for volunteer opportunities to gain experience, help your community, and build your resume.
+                </p>
+                <a href="#" onclick="goToAuth('volunteer')" class="card-button">Find Opportunities</a>
+            </div>
+
+            <div class="signup-card coordinator-card" onclick="goToAuth('coordinator')">
+                <div class="card-icon">🏢</div>
+                <h2 class="card-title">I'm a Coordinator</h2>
+                <p class="card-description">
+                    Representing a community organization or non-profit that wants to create volunteer opportunities.
+                </p>
+                <a href="#" onclick="goToAuth('coordinator')" class="card-button">Create Opportunities</a>
+            </div>
+        </div>
+
+        <div class="features">
+            <h2>Why Choose Volunteer Hub?</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-title">Perfect Matches</div>
+                    <div class="feature-text">Our system matches students with opportunities based on their skills and interests.</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">Track Progress</div>
+                    <div class="feature-text">Students can track their volunteer hours and upload work photos to showcase their impact.</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🌍</div>
+                    <div class="feature-title">Community Impact</div>
+                    <div class="feature-text">Connect with local organizations and make a real difference in your community.</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📝</div>
+                    <div class="feature-title">Easy Management</div>
+                    <div class="feature-text">Coordinators can easily create, manage, and track volunteer opportunities.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Sign In Link -->
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: rgba(255, 255, 255, 0.9); border-radius: 12px;">
+            <p style="color: var(--muted); margin-bottom: 10px;">Already have an account?</p>
+            <a href="/auth/" style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign In Here</a>
+        </div>
+    </div>
+
+    <script>
+        function goToAuth(userType) {
+            // Redirect to auth page with user type parameter
+            window.location.href = `/auth/?type=${userType}`;
+        }
+    </script>
+</body>
+</html>

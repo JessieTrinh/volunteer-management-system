@@ -1,0 +1,317 @@
+<!-- File: signups/templates/signups/home.html
+     Purpose:
+       Modern dashboard for student volunteers to manage their volunteer activities,
+       browse opportunities, and track their progress.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Volunteer Dashboard - Volunteer Hub</title>
+    <style>
+        :root {
+            --bg: #FFF3F7;
+            --primary: #E46B8C;
+            --primary-dark: #C15575;
+            --accent: #F6B26B;
+            --card: #ffffff;
+            --text: #2E2A2B;
+            --muted: #666666;
+            --success: #4CAF50;
+            --shadow: rgba(228, 107, 140, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Inter, system-ui, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .header {
+            background: var(--card);
+            box-shadow: 0 2px 10px var(--shadow);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--primary-dark);
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px var(--shadow);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+
+        .card-description {
+            color: var(--muted);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn.secondary {
+            background: var(--accent);
+        }
+
+        .btn.secondary:hover {
+            background: #D79456;
+        }
+
+        .welcome-section {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .welcome-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+        }
+
+        .welcome-text {
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 Volunteer Dashboard</h1>
+        <nav class="nav-menu">
+            <a href="/browse-opportunities/" class="nav-link">Browse Opportunities</a>
+            <a href="/" class="nav-link">Home</a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h2 class="welcome-title">Welcome back, Volunteer!</h2>
+            <p class="welcome-text">
+                Ready to make a difference? Explore new opportunities, track your progress, and connect with your community.
+            </p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalHours">0</div>
+                <div class="stat-label">Hours Volunteered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedEvents">0</div>
+                <div class="stat-label">Events Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeEvents">0</div>
+                <div class="stat-label">Active Enrollments</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-icon">🔍</div>
+                <h3 class="card-title">Browse Opportunities</h3>
+                <p class="card-description">
+                    Discover volunteer opportunities that match your interests and availability.
+                </p>
+                <a href="/browse-opportunities/" class="btn">Find Opportunities</a>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">👤</div>
+                <h3 class="card-title">Edit Profile & Preferences</h3>
+                <p class="card-description">
+                    Update your profile info, cultural interests, language level, and volunteer preferences all in one place.
+                </p>
+                <a href="#" class="btn secondary" onclick="editProfile()">Manage Profile</a>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">📸</div>
+                <h3 class="card-title">Upload Photos</h3>
+                <p class="card-description">
+                    Share photos from your volunteer work to showcase your contributions to coordinators.
+                </p>
+                <a href="/volunteer-photos/" class="btn">Upload Work Photos</a>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">📜</div>
+                <h3 class="card-title">Certificates</h3>
+                <p class="card-description">
+                    Upload and manage your volunteer certificates and achievements.
+                </p>
+                <a href="/certificates-page/" class="btn">Manage Certificates</a>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">📢</div>
+                <h3 class="card-title">Announcements</h3>
+                <p class="card-description">
+                    Stay updated with the latest news and announcements from organizations.
+                </p>
+                <a href="/posts/" class="btn">Community Announcements</a>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">👥</div>
+                <h3 class="card-title">Community</h3>
+                <p class="card-description">
+                    Connect with other volunteers and see community activity.
+                </p>
+                <a href="/volunteer-list/" class="btn">Volunteer Directory</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load volunteer stats from API
+        async function loadVolunteerStats() {
+            try {
+                // Get current volunteer's statistics
+                const response = await fetch('/api/volunteers/1/summary/');
+                if (response.ok) {
+                    const data = await response.json();
+                    const enrollments = data.enrollments || [];
+                    
+                    // Calculate stats
+                    const totalHours = enrollments.reduce((sum, enrollment) => sum + (enrollment.hours_worked || 0), 0);
+                    const completedEvents = enrollments.filter(e => e.status === 'completed').length;
+                    const activeEvents = enrollments.filter(e => e.status === 'active').length;
+                    
+                    // Update display
+                    document.getElementById('totalHours').textContent = totalHours;
+                    document.getElementById('completedEvents').textContent = completedEvents;
+                    document.getElementById('activeEvents').textContent = activeEvents;
+                } else {
+                    // Fallback to demo data if API fails
+                    console.log('Using demo data - API not available');
+                    document.getElementById('totalHours').textContent = '24';
+                    document.getElementById('completedEvents').textContent = '5';
+                    document.getElementById('activeEvents').textContent = '2';
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                // Fallback to demo data
+                document.getElementById('totalHours').textContent = '24';
+                document.getElementById('completedEvents').textContent = '5';
+                document.getElementById('activeEvents').textContent = '2';
+            }
+        }
+
+        // Edit profile function - redirect to edit profile page
+        function editProfile() {
+            window.location.href = '/edit-profile/';
+        }
+
+        // Load stats when page loads
+        document.addEventListener('DOMContentLoaded', loadVolunteerStats);
+    </script>
+</body>
+</html>

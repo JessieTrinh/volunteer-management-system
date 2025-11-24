@@ -1,0 +1,507 @@
+<!-- File: signups/templates/signups/browse_opportunities.html
+     Purpose:
+       Page for volunteers to browse and apply to existing volunteer opportunities
+       created by coordinators. Shows available roles with filtering options.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browse Opportunities - Volunteer Hub</title>
+    <style>
+        :root {
+            --bg: #FFF3F7;
+            --primary: #E46B8C;
+            --primary-dark: #C15575;
+         // Event listeners
+        document.getElementById('languageLevel').addEventListener('change', filterOpportunities);
+        document.getElementById('taskComplexity').addEventListener('change', filterOpportunities);
+
+        // Load opportunities and setup navigation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setupNavigation();
+            loadOpportunities();
+        });     --accent: #F6B26B;
+            --card: #ffffff;
+            --text: #2E2A2B;
+            --muted: #666666;
+            --success: #4CAF50;
+            --shadow: rgba(228, 107, 140, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Inter, system-ui, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .header {
+            background: var(--card);
+            box-shadow: 0 2px 10px var(--shadow);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .filter-section {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .filter-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        select {
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .opportunities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .opportunity-card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .opportunity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .opportunity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .opportunity-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin: 0;
+        }
+
+        .opportunity-date {
+            background: var(--accent);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .opportunity-details {
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .detail-icon {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        .tags-section {
+            margin-bottom: 20px;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: #f0f4ff;
+            color: var(--primary-dark);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .level-tag {
+            background: #e8f5e8;
+            color: var(--success);
+        }
+
+        .complexity-tag {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .apply-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .apply-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .apply-btn:disabled {
+            background: var(--muted);
+            cursor: not-allowed;
+        }
+
+        .no-opportunities {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .no-opportunities-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌟 Browse Opportunities</h1>
+        <nav class="nav-menu">
+            <a href="#" class="nav-link" id="dashboard-link">Dashboard</a>
+            <a href="/" class="nav-link">Home</a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <div class="filter-section">
+            <h3 class="filter-title">Filter Opportunities</h3>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="languageLevel">Language Level</label>
+                    <select id="languageLevel">
+                        <option value="">All Levels</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="taskComplexity">Task Complexity</label>
+                    <select id="taskComplexity">
+                        <option value="">All Complexities</option>
+                        <option value="simple">Simple</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="complex">Complex</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            <div>Loading opportunities...</div>
+        </div>
+
+        <div id="opportunities-container" class="opportunities-grid" style="display: none;">
+            <!-- Opportunities will be populated here -->
+        </div>
+
+        <div id="no-opportunities" class="no-opportunities" style="display: none;">
+            <div class="no-opportunities-icon">📋</div>
+            <h3>No opportunities found</h3>
+            <p>Try adjusting your filters or check back later for new opportunities.</p>
+        </div>
+    </div>
+
+    <script>
+        let allOpportunities = [];
+
+        // Set up navigation based on referrer
+        function setupNavigation() {
+            const dashboardLink = document.getElementById('dashboard-link');
+            const referrer = document.referrer;
+            
+            // Check if user came from coordinator dashboard
+            if (referrer.includes('/coordinator-dashboard/')) {
+                dashboardLink.href = '/coordinator-dashboard/';
+                dashboardLink.textContent = 'Coordinator Dashboard';
+            } else {
+                // Default to volunteer dashboard
+                dashboardLink.href = '/home/';
+                dashboardLink.textContent = 'Volunteer Dashboard';
+            }
+        }
+
+        async function loadOpportunities() {
+            try {
+                const response = await fetch('/api/roles/');
+                if (!response.ok) throw new Error('Failed to load opportunities');
+                
+                allOpportunities = await response.json();
+                displayOpportunities(allOpportunities);
+                
+            } catch (error) {
+                console.error('Error loading opportunities:', error);
+                document.getElementById('loading').innerHTML = 
+                    '<div style="color: #f44336;">Error loading opportunities. Please try again later.</div>';
+            }
+        }
+
+        function displayOpportunities(opportunities) {
+            const container = document.getElementById('opportunities-container');
+            const loading = document.getElementById('loading');
+            const noOpportunities = document.getElementById('no-opportunities');
+            const referrer = document.referrer;
+            const isCoordinator = referrer.includes('/coordinator-dashboard/');
+            const buttonText = isCoordinator ? 'View Details' : 'Apply Now';
+            
+            loading.style.display = 'none';
+            
+            if (opportunities.length === 0) {
+                container.style.display = 'none';
+                noOpportunities.style.display = 'block';
+                return;
+            }
+            
+            noOpportunities.style.display = 'none';
+            container.style.display = 'grid';
+            
+            container.innerHTML = opportunities.map(opportunity => `
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <h3 class="opportunity-title">${opportunity.title}</h3>
+                        <span class="opportunity-date">${formatDate(opportunity.date)}</span>
+                    </div>
+                    
+                    <div class="opportunity-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">📍</span>
+                            <span>${opportunity.location}</span>
+                        </div>
+                        ${opportunity.coordinator ? `
+                            <div class="detail-item">
+                                <span class="detail-icon">🏢</span>
+                                <span>${opportunity.coordinator.name || 'Community Organization'}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="tags-section">
+                        <div class="tags-container">
+                            <span class="tag level-tag">${capitalizeFirst(opportunity.language_level)} Level</span>
+                            <span class="tag complexity-tag">${capitalizeFirst(opportunity.task_complexity)} Task</span>
+                            ${opportunity.cultural_themes ? opportunity.cultural_themes.map(theme => 
+                                `<span class="tag">${theme.name}</span>`
+                            ).join('') : ''}
+                        </div>
+                    </div>
+                    
+                    <button class="apply-btn" onclick="applyToOpportunity(${opportunity.id})">
+                        ${buttonText}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function filterOpportunities() {
+            const languageLevel = document.getElementById('languageLevel').value;
+            const taskComplexity = document.getElementById('taskComplexity').value;
+            
+            let filtered = allOpportunities;
+            
+            if (languageLevel) {
+                filtered = filtered.filter(opp => opp.language_level === languageLevel);
+            }
+            
+            if (taskComplexity) {
+                filtered = filtered.filter(opp => opp.task_complexity === taskComplexity);
+            }
+            
+            displayOpportunities(filtered);
+        }
+
+        async function applyToOpportunity(roleId) {
+            const referrer = document.referrer;
+            const isCoordinator = referrer.includes('/coordinator-dashboard/');
+            
+            if (isCoordinator) {
+                // Coordinator viewing - show opportunity details or collaboration option
+                const confirmed = confirm('This will open the opportunity details. Would you like to view more information about this opportunity for potential collaboration?');
+                if (!confirmed) return;
+                
+                // For coordinators, we could show more details or contact information
+                alert('Coordinator feature: This could open detailed view with contact information for collaboration opportunities. Feature coming soon!');
+                return;
+            }
+            
+            // Volunteer application logic
+            const confirmed = confirm('Would you like to apply for this volunteer opportunity?');
+            if (!confirmed) return;
+            
+            try {
+                // This is a placeholder - you would need to implement volunteer ID tracking
+                const volunteerResponse = await fetch('/api/volunteers/');
+                const volunteers = await volunteerResponse.json();
+                
+                if (volunteers.length === 0) {
+                    alert('Please complete your volunteer profile first.');
+                    window.location.href = '/edit-profile/';
+                    return;
+                }
+                
+                // For demo purposes, use the first volunteer
+                const volunteerId = volunteers[0].id;
+                
+                const enrollmentResponse = await fetch('/api/enrollments/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        volunteer: volunteerId,
+                        role: roleId
+                    })
+                });
+                
+                if (enrollmentResponse.ok) {
+                    alert('Application submitted successfully! You can track your enrollment in your dashboard.');
+                    window.location.href = '/home/';
+                } else {
+                    throw new Error('Failed to submit application');
+                }
+                
+            } catch (error) {
+                console.error('Error applying to opportunity:', error);
+                alert('Error submitting application. Please try again.');
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+        }
+
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Event listeners
+        document.getElementById('languageLevel').addEventListener('change', filterOpportunities);
+        document.getElementById('taskComplexity').addEventListener('change', filterOpportunities);
+
+        // Load opportunities when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setupNavigation();
+            loadOpportunities();
+        });
+    </script>
+</body>
+</html>
