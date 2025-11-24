@@ -149,10 +149,8 @@ Through this project, I demonstrated proficiency in:
 
 ## 📞 Contact
 
-**Your Name** - your.email@example.com
-
-Portfolio: [your-portfolio-website.com](https://your-portfolio-website.com)
-LinkedIn: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
+Jessie Trinh - jessie.trinh@usask.ca
+LinkedIn: https://www.linkedin.com/in/jessie-trinh/
 
 ---
 
